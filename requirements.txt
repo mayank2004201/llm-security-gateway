@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+requests
+cryptography
+pydantic
+python-dotenv
+jinja2
+streamlit
+pandas
+plotly
