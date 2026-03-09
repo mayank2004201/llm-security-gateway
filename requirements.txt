@@ -3,6 +3,7 @@ uvicorn
 requests
 cryptography
 pydantic
+websockets
 python-dotenv
 jinja2
 streamlit

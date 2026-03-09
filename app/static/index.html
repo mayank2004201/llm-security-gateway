@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Security Gateway Pro</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Left Pane: Chat Interface -->
+        <div class="chat-pane">
+            <header class="chat-header">
+                <div class="brand">
+                    <span class="shield-icon">🛡️</span>
+                    <h1>Gateway Pro Interface</h1>
+                </div>
+                <div class="model-selector">
+                    <label for="model-select">Model:</label>
+                    <select id="model-select" class="premium-select">
+                        <option value="groq/llama-3.3-70b-versatile">Groq - Llama 3.3 70B</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="chat-history" id="chat-history">
+                <div class="welcome-message">
+                    <h3>Secure LLM Endpoint</h3>
+                    <p>All interactions are evaluated by real-time security guards.</p>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <textarea id="prompt-input" placeholder="Type a message... (Press Enter to send)" rows="1"></textarea>
+                <button id="send-btn" class="primary-btn">
+                    <span>Send</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Pane: Live Gateway Logs -->
+        <div class="log-pane">
+            <header class="log-header">
+                <h2><span class="live-dot"></span> Live Gateway Activity</h2>
+                <button id="clear-logs-btn" class="icon-btn" title="Clear Logs">🗑️</button>
+            </header>
+
+            <div class="log-stream" id="log-stream">
+                <!-- Log cards will be injected here dynamically -->
+                <div class="log-card system-log">
+                    <div class="log-time">System</div>
+                    <div class="log-content">Waiting for connection to Gateway...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
