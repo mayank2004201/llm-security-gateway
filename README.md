@@ -83,5 +83,27 @@ graph TD
    python client.py
    ```
 
+## 🐋 Docker & Deployment
+
+### Run with Docker Locally
+1. **Build the image**:
+   ```bash
+   docker build -t llm-gateway .
+   ```
+2. **Run the container**:
+   ```bash
+   docker run -p 8000:8000 \
+     -e SECRET_KEY=your_secret_key \
+     -e ENCRYPTION_KEY=your_encryption_key \
+     -e GROQ_API_KEY=your_groq_key \
+     llm-gateway
+   ```
+
+### Deploy to Render
+This project includes a `render.yaml` blueprint for quick deployment:
+1. Connect your GitHub repository to Render.
+2. Render will automatically detect the `render.yaml` file and offer to create the **API** and **Dashboard** services.
+3. Configure the `ENCRYPTION_KEY` and `GROQ_API_KEY` in the Render dashboard during setup.
+
 ## 🔒 Security Note
 This project uses **Fernet AES encryption** to protect user logs and sensitive responses in the database, ensuring privacy and compliance even at rest.
