@@ -4,7 +4,7 @@ import os
 
 def run():
     # Set up paths
-    script_path = os.path.join("app", "dashboard", "app.py")
+    script_path = os.path.join("app", "dashboard", "dashboard_main.py")
     
     # Get port from environment (Render default is often 10000, but they provide $PORT)
     port = os.getenv("PORT", "8501")
