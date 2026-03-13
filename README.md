@@ -1,109 +1,154 @@
-# 🛡️ LLM Security Gateway Pro
+# LLM Security Gateway
 
-An enterprise-grade security proxy designed to monitor, filter, and govern interactions between internal users and Large Language Models (LLMs) like Groq and Ollama. This project implements advanced guardrails and a modern administrative dashboard to ensure safe and compliant AI adoption.
+A robust, middleware-based security layer designed to sit between users and Large Language Models (LLMs). This gateway ensures safe, compliant, and cost-effective AI interactions by intercepting requests and responses to mitigate common LLM vulnerabilities.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Advanced Security Guardrails**:
-    - **Prompt Injection Detection**: Identifies system override attempts and malicious instructions.
-    - **PII Leakage Prevention**: Automatically detects sensitive data (Emails, SSNs, Credit Cards).
-    - **Harmful Content Filtering**: Classifies and blocks violent, hateful, or sensitive outputs.
-- **Human-in-the-Loop (HITL)**: Automatically queues high-risk requests for manual administrative approval.
-- **Intelligence Analytics Dashboard**: Premium Streamlit UI featuring:
-    - Real-time traffic monitoring and token expenditure tracking.
-    - Model distribution analytics and security posture breakdowns.
-    - Searchable history with end-to-end encrypted log viewing.
-- **Modular Enterprise Architecture**: Professional directory structure for high maintainability and scalability.
+* **Prompt Injection Defense:** Real-time scanning of incoming prompts to detect and block adversarial injection attempts.
+* **PII Detection:** Automatically identifies Personally Identifiable Information (PII) to assess interaction risk.
+* **Sensitive Content Filtering:** Blocks toxic, harmful, or non-compliant content in both prompts and model completions.
+* **Audit Logging:** Detailed logging of all interactions (with latency and cost tracking) for compliance and monitoring.
+* **Multi-Provider Support:** Integration with Groq and local models (via Ollama).
 
-## 🏗️ Architecture
+## 🛠️ Tech Stack
+
+* **Language:** Python 3.10+
+* **Framework:** FastAPI (High performance, asynchronous)
+* **Validation:** Pydantic V2
+* **Security:** Regular expression engines & Pre-trained NLP classifiers
+* **Containerization:** Docker & Docker Compose
+
+## 📦 Installation
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/mayank2004201/llm-security-gateway.git
+cd llm-security-gateway
+```
+
+2. **Set up Environment Variables:**
+Create a `.env` file in the root directory:
+```env
+OPENAI_API_KEY=your_key_here
+GATEWAY_AUTH_TOKEN=your_secure_token
+LOG_LEVEL=INFO
+```
+
+3. **Run with Docker:**
+```bash
+docker build -t llm-security-gateway .
+docker run -p 8000:8000 llm-security-gateway
+```
+
+## 🖥️ Usage
+
+Route your LLM requests through the gateway's endpoint:
+
+```bash
+curl -X POST "http://localhost:8000/v1/chat/completions" \
+     -H "Authorization: Bearer your_secure_token" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "model": "gpt-4",
+           "messages": [{"role": "user", "content": "Tell me a joke about security."}]
+         }'
+```
+
+## 🛡️ Security Layers
+
+1. **Input Sanitization:** Removes hidden characters and escape sequences.
+2. **Pattern Matching:** Detects "jailbreak" keywords and malicious prompt structures.
+3. **Output Guardrails:** Validates that the model's response adheres to defined safety constraints.
+
+## 🧠 Core Concepts & Implementation
+
+The **LLM Security Gateway** is built on the principle of **Defense-in-Depth**. It implements several industry-standard security patterns to ensure LLM reliability and safety.
+
+### 🛡️ 1. Input Guardrails (Prompt Shielding)
+
+Before a request reaches the LLM, it passes through multiple "Guardrails" to detect malicious intent.
+
+* **Prompt Injection Detection:** We use a combination of **Heuristic Analysis** (keyword blacklisting like "ignore previous instructions") and **Semantic Analysis** to identify attempts to bypass system prompts.
+* **Jailbreak Mitigation:** Filters designed to catch common jailbreak techniques (e.g., "DAN" or "Payload Splitting").
+
+### 🔒 2. Data Privacy & PII Detection
+
+To ensure awareness of data privacy, the gateway scans outgoing prompts for sensitive information.
+
+* **Regex-based Scanning:** Identification of patterns like Credit Card numbers, SSNs, and Emails.
+* **Risk Assessment:** PII detection contributes to an overall safety score, which can trigger admin approval workflows.
+
+### 🚦 3. Operational Middleware
+
+Beyond security, the gateway manages interaction efficiency:
+
+* **Latency Tracking:** Real-time monitoring of LLM response times.
+* **Cost Estimation:** Metadata extraction to track token usage and estimated costs per session.
+
+### 📊 4. Observability & Audit Trails
+
+* **Semantic Logging:** We log not just the raw text, but the *intent* and *safety score* of every interaction.
+* **Cost Tracking:** Metadata is extracted from LLM responses to track token usage per user/session in real-time.
+
+## 🛠️ Implementation Detail: The Gateway Flow
 
 ```mermaid
-graph TD
-    User([User/Client]) -->|1. Prompt| Gateway[run_api.py]
-    Gateway -->|2. Check| InGuard[Input Guards]
-    InGuard -->|3. High Risk| Apprv[Approval Queue]
-    Apprv -->|4. Manual Review| Admin[Admin Dashboard]
-    Gateway -->|5. Authorized| LLM{LLM Provider}
-    LLM -->|6. Result| OutGuard[Output Guards]
-    OutGuard -->|7. Verified| User
-    OutGuard -->|8. Log & Encrypt| DB[(SQLite DB)]
+graph LR
+    A[Client Request] --> B[Auth Layer]
+    B --> C[Input Guardrails]
+    C --> D[PII Redaction]
+    D --> E[LLM Provider]
+    E --> F[Output Validation]
+    F --> G[Client]
 ```
+
+1. **Auth Layer:** Validates the `GATEWAY_AUTH_TOKEN`.
+2. **Input Guardrails:** Scans for prompt injections.
+3. **PII Redaction:** Masks sensitive data.
+4. **LLM Provider:** Securely calls the external/internal API.
+5. **Output Validation:** Ensures the model didn't hallucinate or leak internal system prompts in its response.
 
 ## 📂 Project Structure
 
-- **`app/`**: Service layer containing the FastAPI server and Streamlit UI logic.
-- **`core/`**: Domain layer for security logic, LLM adapters, and cryptographic handlers.
-- **`data/`**: Data persistence layer with SQLite repository patterns.
-- **`utils/`**: Shared infrastructure utilities.
-- **`run_api.py`**: Entrance for the Security Proxy.
-- **`run_dashboard.py`**: Entrance for the Analytics UI.
-- **`client.py`**: Developer CLI for testing interactions.
+This repository follows a modular architecture to separate security logic, API routing, and LLM provider integrations.
 
-## 🛠️ Setup & Installation
+```text
+llm-security-gateway/
+├── app/                        # Web application and API
+│   ├── api/                    # API route definitions & schemas
+│   │   ├── routes.py           # Main endpoints (chat, completions)
+│   │   └── schemas.py          # Pydantic models
+│   ├── server.py               # FastAPI application entry point
+│   └── static/                 # Frontend assets (dashboard)
+├── core/                       # Core system logic
+│   ├── config.py               # Environment variables & settings
+│   ├── crypto.py               # Security utilities
+│   ├── llm/                    # LLM Service clients (Groq, Ollama)
+│   └── security/               # Guardrails (Input/Output scanning)
+├── data/                       # Data persistence layer
+│   ├── database.py             # SQLite initialization
+│   └── repository.py           # Database operations
+├── Dockerfile                  # Container instructions
+├── requirements.txt            # Dependencies
+└── README.md                   # Project documentation
+```
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/yourusername/llm-gateway-pro.git
-   cd llm-gateway-pro
-   ```
+### 🧱 Key Component Breakdown
 
-2. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+* **`core/security/`**: Contains the logic for scanning prompts and responses against safety patterns.
+* **`core/llm/`**: Houses the clients for interacting with different model providers.
+* **`app/api/routes.py`**: Orchestrates the flow from request to guardrail to LLM and back.
 
-3. **Configure Environment Variables**:
-   Copy the example template:
-   ```bash
-   cp .env.example .env
-   ```
-   Now, configure your `.env` with the following:
+## 📈 Roadmap
 
-   - **LLM API Key**: Get your free API key from [Groq Cloud Console](https://console.groq.com/keys).
-   - **Encryption Key**: This project uses Fernet encryption for logs. Generate a new key by running this in your Python terminal:
-     ```python
-     from cryptography.fernet import Fernet
-     print(Fernet.generate_key().decode())
-     ```
-   - **Secret Key**: Any long random string for application security.
+* [ ] Integration with LangChain/LlamaIndex.
+* [ ] Semantic caching to reduce costs.
+* [ ] Dashboard for real-time security metrics.
 
-4. **Network Configuration (Optional)**:
-   By default, the gateway runs on `127.0.0.1`. To access it from other devices in your network:
-   - Find your local IP address by running `ipconfig` in your terminal and looking for the **IPv4 Address** (e.g., `192.168.x.x`).
-   - Update `API_HOST` in your `.env` with this IP.
-   - Update `SERVER_URL` in `client.py` to match.
+## 📄 License
 
-5. **Launch the System**:
-   Open two terminal windows:
-   - **Terminal 1**: `python run_api.py` (Starts the Gateway)
-   - **Terminal 2**: `python run_dashboard.py` (Starts the Analytics UI)
+Distributed under the MIT License. See `LICENSE` for more information.
 
-6. **Test the Client**:
-   ```bash
-   python client.py
-   ```
+---
 
-## 🐋 Docker & Deployment
-
-### Run with Docker Locally
-1. **Build the image**:
-   ```bash
-   docker build -t llm-gateway .
-   ```
-2. **Run the container**:
-   ```bash
-   docker run -p 8000:8000 \
-     -e SECRET_KEY=your_secret_key \
-     -e ENCRYPTION_KEY=your_encryption_key \
-     -e GROQ_API_KEY=your_groq_key \
-     llm-gateway
-   ```
-
-### Deploy to Render
-This project includes a `render.yaml` blueprint for quick deployment:
-1. Connect your GitHub repository to Render.
-2. Render will automatically detect the `render.yaml` file and offer to create the **API** and **Dashboard** services.
-3. Configure the `ENCRYPTION_KEY` and `GROQ_API_KEY` in the Render dashboard during setup.
-
-## 🔒 Security Note
-This project uses **Fernet AES encryption** to protect user logs and sensitive responses in the database, ensuring privacy and compliance even at rest.
+*Developed by [Anshul Goel](https://github.com/mayank2004201)*
