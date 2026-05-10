@@ -36,7 +36,7 @@ def run_dashboard():
         col1.metric("Total Traffic", f"{total_reqs:,}")
         col2.metric("Token Consumption", f"{total_tokens:,}")
         col3.metric("Total Expenditure", f"${total_cost:.3f}")
-        col4.metric("Security Incidents", threats + blocked, delta=threats, delta_color="inverse")
+        col4.metric("Security Incidents", int(threats + blocked), delta=int(threats), delta_color="inverse")
         
     elif page == "⚖️ Approvals":
         st.markdown("<div class='main-header'>Pending Approvals</div>", unsafe_allow_html=True)
